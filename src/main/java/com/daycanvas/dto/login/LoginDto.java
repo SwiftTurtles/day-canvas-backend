@@ -1,8 +1,9 @@
 package com.daycanvas.dto.login;
 
 import lombok.Getter;
+import lombok.Setter;
 
-@Getter
+@Getter @Setter
 public class LoginDto {
 
     private String email;
