@@ -17,7 +17,7 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, insertable = false, updatable = false)
-    private int id;
+    private Long id;
 
     @CreationTimestamp
     @Column(name = "write_date", nullable = false, columnDefinition = "TIMESTAMP")
