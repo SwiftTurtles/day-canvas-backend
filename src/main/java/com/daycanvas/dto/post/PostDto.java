@@ -1,8 +1,8 @@
 package com.daycanvas.dto.post;
 
-public class PostRequestDto {
+public class PostDto {
 
-    private String id;
+    private Long id;
     private String content;
 
 }
