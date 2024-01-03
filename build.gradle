@@ -26,7 +26,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'mysql:mysql-connector-java:8.0.23'
-    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8' // Model mapper
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+    testImplementation 'org.projectlombok:lombok:1.18.26'// Model mapper
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
