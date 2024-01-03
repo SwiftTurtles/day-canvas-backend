@@ -20,8 +20,8 @@ public class Post {
     private Long id;
 
     @CreationTimestamp
-    @Column(name = "write_date", nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime writeDate;
+    @Column(name = "written_date", nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime writtenDate;
 
     @Column(name = "content", nullable = false)
     private String content;
