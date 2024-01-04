@@ -2,6 +2,7 @@ package com.daycanvas.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -9,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class MonthlyPostResponseDto {
 
-    private List<String> imagePaths;
+    private List<DayImageMappingDto> imagePaths;
 }

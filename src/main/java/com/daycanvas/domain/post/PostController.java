@@ -1,6 +1,6 @@
 package com.daycanvas.domain.post;
 
-import com.daycanvas.domain.user.User;
+import com.daycanvas.dto.post.DayImageMappingDto;
 import com.daycanvas.dto.post.MonthlyPostResponseDto;
 import com.daycanvas.dto.post.PostRequestDto;
 import com.daycanvas.dto.post.PostResponseDto;
@@ -20,7 +20,7 @@ public class PostController {
     private final PostService service;
     private final ModelMapper modelMapper;
 
-    @PostMapping("/")
+    @PostMapping("")
     public String create(@RequestBody PostRequestDto postRequestDto) {
         Post post = modelMapper.map(postRequestDto, Post.class);
         Long postId = service.save(post);
@@ -28,27 +28,31 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDto> read(@PathVariable int postId) {
+    public ResponseEntity<PostResponseDto> read(@PathVariable Long postId) {
         Post post = service.findById(postId);
         PostResponseDto postDto = modelMapper.map(post, PostResponseDto.class);
         return ResponseEntity.ok(postDto);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<MonthlyPostResponseDto> readByMonth(@RequestParam int month) {
-        List<String> imagePaths = service.findAllByMonth(month);
+    @GetMapping("")
+    public ResponseEntity<MonthlyPostResponseDto> readByMonth(@RequestParam(required = false) Integer year,
+                                                              @RequestParam int month) {
+        if (year == null) {
+            year = LocalDateTime.now().getYear();
+        }
+        List<DayImageMappingDto> imagePaths = service.findAllByMonth(year, month);
         MonthlyPostResponseDto postDto = new MonthlyPostResponseDto(imagePaths);
         return ResponseEntity.ok(postDto);
     }
 
-    @PatchMapping("/")
+    @PatchMapping("")
     public String update(@RequestBody PostRequestDto postRequestDto) {
         Post post = modelMapper.map(postRequestDto, Post.class);
         Long postId = service.update(post);
         return "redirect:/posts/" + postId;
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("")
     public String delete(@RequestBody PostRequestDto postRequestDto) {
         service.delete(postRequestDto.getId());
         return "redirect:/posts?month=" + LocalDateTime.now().getMonthValue();
