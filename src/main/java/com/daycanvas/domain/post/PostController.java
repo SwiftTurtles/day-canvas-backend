@@ -1,5 +1,6 @@
 package com.daycanvas.domain.post;
 
+import com.daycanvas.dto.post.DayImageMappingDto;
 import com.daycanvas.dto.post.MonthlyPostResponseDto;
 import com.daycanvas.dto.post.PostRequestDto;
 import com.daycanvas.dto.post.PostResponseDto;
@@ -34,8 +35,12 @@ public class PostController {
     }
 
     @GetMapping("")
-    public ResponseEntity<MonthlyPostResponseDto> readByMonth(@RequestParam int month) {
-        List<String> imagePaths = service.findAllByMonth(month);
+    public ResponseEntity<MonthlyPostResponseDto> readByMonth(@RequestParam(required = false) Integer year,
+                                                              @RequestParam int month) {
+        if (year == null) {
+            year = LocalDateTime.now().getYear();
+        }
+        List<DayImageMappingDto> imagePaths = service.findAllByMonth(year, month);
         MonthlyPostResponseDto postDto = new MonthlyPostResponseDto(imagePaths);
         return ResponseEntity.ok(postDto);
     }

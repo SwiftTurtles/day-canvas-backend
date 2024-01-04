@@ -21,7 +21,7 @@ public class PostRepositoryTest {
         Post post = new Post();
         post.setContent("Test content");
         post.setImagePath("/images/test.jpg");
-        post.setWriteDate(LocalDateTime.now());
+        post.setWrittenDate(LocalDateTime.now());
 
         // When
         postRepository.save(post);

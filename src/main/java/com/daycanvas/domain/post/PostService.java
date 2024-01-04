@@ -1,5 +1,7 @@
 package com.daycanvas.domain.post;
 
+import com.daycanvas.dto.post.DayImageMappingDto;
+import com.daycanvas.dto.post.MonthlyPostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +37,8 @@ public class PostService {
         }
     }
 
-    public List<String> findAllByMonth(int month) {
-        return null;
+    public List<DayImageMappingDto> findAllByMonth(int year, int month) { // @Todo 유저 필터링(id, 세선) 추가
+        return repository.findAllByMonthAndYear(year, month);
     }
 
     public Long update(Post post) {

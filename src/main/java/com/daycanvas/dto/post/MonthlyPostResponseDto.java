@@ -6,9 +6,9 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
 @AllArgsConstructor
 public class MonthlyPostResponseDto {
 
-    private List<String> imagePaths;
+    private List<DayImageMappingDto> imagePaths;
 }
