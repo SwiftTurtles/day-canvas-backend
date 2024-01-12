@@ -1,24 +1,30 @@
 package com.daycanvas.domain.post;
 
 import com.daycanvas.dto.post.DayImageMappingDto;
-import com.daycanvas.dto.post.MonthlyPostResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
+    @Value("${flask.api.url}")
+    private String flaskApiUrl;
+    private final RestTemplate restTemplate = new RestTemplate();
+
     private final PostRepository repository;
 
     public Long save(Post post) {
-        post.setImagePath("image_path"); // @Todo image path -> AI Model 호출 <추후>
+        ResponseEntity<String> response = restTemplate.postForEntity(flaskApiUrl, post.getContent().getBytes(), String.class);
+        post.setImagePath(response.getBody());
         return repository.save(post).getId();
     }
 
@@ -48,7 +54,8 @@ public class PostService {
             if (OptionalPost.isPresent()) {
                 Post savedPost = OptionalPost.get();
                 savedPost.setContent(post.getContent());
-                savedPost.setImagePath("updated image Path");   // @Todo img 생성 ai 호출로 추푸 변경
+                ResponseEntity<String> response = restTemplate.postForEntity(flaskApiUrl, post.getContent().getBytes(), String.class);
+                savedPost.setImagePath(response.getBody());
                 repository.save(savedPost);
                 return savedPost.getId();
             }
