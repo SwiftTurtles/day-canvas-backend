@@ -2,9 +2,13 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/day_canvas
     username: root
-    password: swacademytest # root 계정의 password   '   '  작은 따옴표 사용
+    password:  # root 계정의 password   '   '  작은 따옴표 사용
   jpa:
     database: mysql
     show-sql: true
     hibernate:
       ddl-auto: update
+
+flask:
+  api:
+    url: http://127.0.0.1:5000/image
