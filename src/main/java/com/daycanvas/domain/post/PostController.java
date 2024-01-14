@@ -37,9 +37,12 @@ public class PostController {
 
     @GetMapping("")
     public ResponseEntity<MonthlyPostResponseDto> readByMonth(@RequestParam(required = false) Integer year,
-                                                              @RequestParam int month) {
+                                                              @RequestParam(required = false) Integer month) {
         if (year == null) {
             year = LocalDateTime.now().getYear();
+        }
+        if (month == null) {
+            month = LocalDateTime.now().getMonthValue();
         }
         List<DayImageMappingDto> imagePaths = service.findAllByMonth(year, month);
         MonthlyPostResponseDto postDto = new MonthlyPostResponseDto(imagePaths);
