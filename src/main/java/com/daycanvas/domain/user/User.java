@@ -16,14 +16,18 @@ public class User {
     @Column(name = "id", nullable = false, insertable = false, updatable = false)
     private Long id;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = true)
     private String email;
 
-    // @Todo Password Encoding 적용
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @Column(name = "nickname", nullable = false, unique = true)
+    @Column(name = "nickname", nullable = true)
     private String nickname;
 
+    @Column(name = "provider")
+    private String provider; //사용자가 로그인한 서비스 ex) google, kakao, naver ...etc
+
+    public User updateUser(String email, String nickname, String provider) {
+        this.setEmail(email);
+        this.setProvider(provider);
+        return this;
+    }
 }

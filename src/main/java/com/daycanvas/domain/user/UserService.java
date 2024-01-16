@@ -5,40 +5,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository repository;
-
-    public Long save(User user) {
-        return repository.save(user).getId();
-    }
-
-    public Long login(String email, String password) {
-        // @Todo 추후 변경
-        Optional<User> userOptional = repository.findByEmail(email);
-
-        if(userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            try {
-                if (user.getPassword().equals(password)) {
-                    return user.getId();
-                }
-                else {
-                    return null;
-                }
-            } catch (NullPointerException e) {
-                return null;
-            }
-        }
-        else {
-            return null;
-        }
-    }
 
     public void delete(Long userId) {
         try {
