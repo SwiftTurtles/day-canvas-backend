@@ -1,11 +1,15 @@
 package com.daycanvas.domain.post;
 
+import com.daycanvas.domain.user.User;
+import com.daycanvas.domain.user.UserService;
 import com.daycanvas.dto.post.DayImageMappingDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,12 +23,17 @@ public class PostService {
     @Value("${flask.api.url}")
     private String flaskApiUrl;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final UserService userService;
 
     private final PostRepository repository;
 
-    public Long save(Post post) {
+    public Long save(Post post, @AuthenticationPrincipal OAuth2User principal) {
         ResponseEntity<String> response = restTemplate.postForEntity(flaskApiUrl, post.getContent().getBytes(), String.class);
+        User user = userService.findUserById(principal);
         post.setImagePath(response.getBody());
+        post.setUser(user);
+        user.addPost(post);
+
         return repository.save(post).getId();
     }
 

@@ -7,6 +7,8 @@ import com.daycanvas.dto.post.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +24,9 @@ public class PostController {
     private final ModelMapper modelMapper;
 
     @PostMapping("")
-    public String create(@RequestBody PostRequestDto postRequestDto) {
+    public String create(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal OAuth2User principal) {
         Post post = modelMapper.map(postRequestDto, Post.class);
-        Long postId = service.save(post);
+        Long postId = service.save(post, principal);
         return "redirect:/posts/" + postId;
     }
 

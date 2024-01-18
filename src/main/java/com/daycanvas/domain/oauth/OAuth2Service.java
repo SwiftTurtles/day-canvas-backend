@@ -49,10 +49,13 @@ public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth
         if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
             userDto.setNickname(extractNickname(userDto.getEmail()));
         }
-        updateOrSaveUser(userDto);
+
+        User user = updateOrSaveUser(userDto);
 
         Map<String, Object> customAttribute =
                 getCustomAttribute(registrationId, userNameAttributeName, attributes, userDto);
+
+        customAttribute.put("user_id", user.getId());   // Post-userId post 작성시 userId set 해줘야하기에
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("USER")),
