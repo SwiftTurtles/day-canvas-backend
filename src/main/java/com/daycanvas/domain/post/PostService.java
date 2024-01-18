@@ -56,6 +56,11 @@ public class PostService {
         return repository.findAllByMonthAndYear(year, month);
     }
 
+    public List<Post> findAll(@AuthenticationPrincipal OAuth2User principal) {
+        Long userId = getUserId(principal);
+        return repository.findByUserId(userId);
+    }
+
     public Long update(Post post) {
         try {
             Optional <Post> OptionalPost = repository.findById(post.getId());
@@ -87,6 +92,10 @@ public class PostService {
             // 그 외 데이터베이스 관련 예외 처리
             throw new RuntimeException("Error deleting user with ID " + postId, ex);
         }
+    }
+
+    private static Long getUserId(OAuth2User principal) {
+        return principal.getAttribute("user_id");
     }
 
 }
