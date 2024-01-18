@@ -1,6 +1,8 @@
 package com.daycanvas.domain.post;
 
 import javax.persistence.*;
+
+import com.daycanvas.domain.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,4 +31,14 @@ public class Post {
     @Column(name = "image_path", nullable = false)
     private String imagePath;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user != null) {
+            user.getPosts().add(this);
+        }
+    }
 }

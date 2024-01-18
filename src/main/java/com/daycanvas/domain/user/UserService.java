@@ -3,6 +3,8 @@ package com.daycanvas.domain.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,6 +12,17 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository repository;
+
+    public User findUserById(@AuthenticationPrincipal OAuth2User principal) {
+        Long id = principal.getAttribute("user_id");
+        try {
+            return repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User with ID " + id + " not found for deletion."));
+        } catch (DataAccessException ex) {
+            // 데이터베이스 관련 예외 처리
+            throw new RuntimeException("Error deleting user with ID " + id, ex);
+        }
+    }
 
     public void delete(Long userId) {
         try {
