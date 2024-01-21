@@ -52,33 +52,40 @@ public class PostService {
         }
     }
 
-    public List<DayImageMappingDto> findAllByMonth(int year, int month) { // @Todo 유저 필터링(id, 세선) 추가
-        return repository.findAllByMonthAndYear(year, month);
+    public List<DayImageMappingDto> findAllByMonth(int year, int month, @AuthenticationPrincipal OAuth2User principal) {
+        return repository.findAllByMonthAndYear(getUserId(principal), year, month);
     }
 
-    public Long update(Post post) {
-        try {
-            Optional <Post> OptionalPost = repository.findById(post.getId());
+    public List<Post> findAll(@AuthenticationPrincipal OAuth2User principal) {
+        Long userId = getUserId(principal);
+        return repository.findByUserId(userId);
+    }
 
-            if (OptionalPost.isPresent()) {
-                Post savedPost = OptionalPost.get();
-                savedPost.setContent(post.getContent());
-                ResponseEntity<String> response = restTemplate.postForEntity(flaskApiUrl, post.getContent().getBytes(), String.class);
-                savedPost.setImagePath(response.getBody());
-                repository.save(savedPost);
-                return savedPost.getId();
-            }
+    public Long update(Post post, @AuthenticationPrincipal OAuth2User principal) {
+        try {
+            Post savedPost = getSavedPost(post.getId());
+
+            validateUserPermission(savedPost.getUser().getId(), principal);
+
+            savedPost.setContent(post.getContent());
+            ResponseEntity<String> response = restTemplate.postForEntity(flaskApiUrl, post.getContent().getBytes(), String.class);
+            savedPost.setImagePath(response.getBody());
+            repository.save(savedPost);
+            return savedPost.getId();
         } catch (EmptyResultDataAccessException ex) {
             throw new RuntimeException("Post not found for deletion.");
         } catch (DataAccessException ex) {
             // 그 외 데이터베이스 관련 예외 처리
             throw new RuntimeException("Error finding exist post", ex);
         }
-        return null;
     }
 
-    public void delete(Long postId) {
+    public void delete(Long postId, @AuthenticationPrincipal OAuth2User principal) {
         try {
+            Post savedPost = getSavedPost(postId);
+
+            validateUserPermission(savedPost.getUser().getId(), principal);
+
             repository.deleteById(postId);
         } catch (EmptyResultDataAccessException ex) {
             // 삭제할 대상이 없는 경우에 대한 예외 처리
@@ -89,4 +96,35 @@ public class PostService {
         }
     }
 
+    /**
+     *
+     * @param postId PostId
+     * @return Repository로 부터 getPost => 찾지 못한다면 예외 throw
+     */
+    private Post getSavedPost(Long postId) {
+        Optional<Post> optionalPost = repository.findById(postId);
+        return optionalPost.orElseThrow(() -> new RuntimeException("Post not found for ID: " + postId));
+    }
+
+    /**
+     * Post-userId == Login-userId
+     * 로그인된 user와 post작성한 user 같은지 검증하는 method
+     * @param userId Post에 저장되어 있는 Post-user_id 매개변수로 받는다
+     * @param principal OAuth2User
+     */
+    private static void validateUserPermission(Long userId, OAuth2User principal) {
+        Long loginUserId = getUserId(principal);
+        if (!loginUserId.equals(userId)) {
+            throw new RuntimeException("User does not have permission to perform this operation");
+        }
+    }
+
+    /**
+     * OAuth2User에서 담아놨던 user_id를 꺼내는 method
+     * @param principal OAuth2User
+     * @return userid
+     */
+    private static Long getUserId(OAuth2User principal) {
+        return principal.getAttribute("user_id");
+    }
 }

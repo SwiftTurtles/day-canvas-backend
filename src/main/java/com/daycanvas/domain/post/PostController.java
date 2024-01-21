@@ -6,6 +6,7 @@ import com.daycanvas.dto.post.PostRequestDto;
 import com.daycanvas.dto.post.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -39,28 +40,44 @@ public class PostController {
 
     @GetMapping("")
     public ResponseEntity<MonthlyPostResponseDto> readByMonth(@RequestParam(required = false) Integer year,
-                                                              @RequestParam(required = false) Integer month) {
+                                                              @RequestParam(required = false) Integer month, @AuthenticationPrincipal OAuth2User principal) {
         if (year == null) {
             year = LocalDateTime.now().getYear();
         }
         if (month == null) {
             month = LocalDateTime.now().getMonthValue();
         }
-        List<DayImageMappingDto> imagePaths = service.findAllByMonth(year, month);
+        List<DayImageMappingDto> imagePaths = service.findAllByMonth(year, month, principal);
         MonthlyPostResponseDto postDto = new MonthlyPostResponseDto(imagePaths);
         return ResponseEntity.ok(postDto);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<PostResponseDto>> getPostsByUserId(@AuthenticationPrincipal OAuth2User principal) {
+        if (principal == null) {
+            // 사용자가 인증되지 않았으므로 에러 핸들링 또는 리다이렉트 등을 수행
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<Post> posts = service.findAll(principal);
+
+        List<PostResponseDto> listPosts = posts.stream()
+                .map(post -> modelMapper.map(post, PostResponseDto.class))
+                .toList();
+
+        return ResponseEntity.ok(listPosts);
+    }
+
     @PatchMapping("")
-    public String update(@RequestBody PostRequestDto postRequestDto) {
+    public String update(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal OAuth2User principal) {
         Post post = modelMapper.map(postRequestDto, Post.class);
-        Long postId = service.update(post);
+        Long postId = service.update(post, principal);
         return "redirect:/posts/" + postId;
     }
 
     @DeleteMapping("")
-    public String delete(@RequestBody PostRequestDto postRequestDto) {
-        service.delete(postRequestDto.getId());
+    public String delete(@RequestParam(required = true) Long postId, @AuthenticationPrincipal OAuth2User principal) {
+        service.delete(postId, principal);
         return "redirect:/posts?month=" + LocalDateTime.now().getMonthValue();
     }
 }
