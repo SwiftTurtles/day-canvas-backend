@@ -61,12 +61,18 @@ public class PostService {
         return repository.findByUserId(userId);
     }
 
-    public Long update(Post post) {
+    public Long update(Post post, @AuthenticationPrincipal OAuth2User principal) {
         try {
             Optional <Post> OptionalPost = repository.findById(post.getId());
 
             if (OptionalPost.isPresent()) {
                 Post savedPost = OptionalPost.get();
+                Long userId = getUserId(principal);
+
+                // 로그인한 User와 글을 작성한 User가 다른 경우 수정 불가 -> 예외처리
+                if(!userId.equals(savedPost.getId())) {
+                    throw new RuntimeException("User does not have permission to update this post");
+                }
                 savedPost.setContent(post.getContent());
                 ResponseEntity<String> response = restTemplate.postForEntity(flaskApiUrl, post.getContent().getBytes(), String.class);
                 savedPost.setImagePath(response.getBody());

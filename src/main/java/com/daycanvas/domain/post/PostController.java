@@ -69,9 +69,9 @@ public class PostController {
     }
 
     @PatchMapping("")
-    public String update(@RequestBody PostRequestDto postRequestDto) {
+    public String update(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal OAuth2User principal) {
         Post post = modelMapper.map(postRequestDto, Post.class);
-        Long postId = service.update(post);
+        Long postId = service.update(post, principal);
         return "redirect:/posts/" + postId;
     }
 
