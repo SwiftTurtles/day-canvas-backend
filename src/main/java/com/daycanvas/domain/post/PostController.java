@@ -40,14 +40,14 @@ public class PostController {
 
     @GetMapping("")
     public ResponseEntity<MonthlyPostResponseDto> readByMonth(@RequestParam(required = false) Integer year,
-                                                              @RequestParam(required = false) Integer month) {
+                                                              @RequestParam(required = false) Integer month, @AuthenticationPrincipal OAuth2User principal) {
         if (year == null) {
             year = LocalDateTime.now().getYear();
         }
         if (month == null) {
             month = LocalDateTime.now().getMonthValue();
         }
-        List<DayImageMappingDto> imagePaths = service.findAllByMonth(year, month);
+        List<DayImageMappingDto> imagePaths = service.findAllByMonth(year, month, principal);
         MonthlyPostResponseDto postDto = new MonthlyPostResponseDto(imagePaths);
         return ResponseEntity.ok(postDto);
     }

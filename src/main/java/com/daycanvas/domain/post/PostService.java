@@ -52,8 +52,8 @@ public class PostService {
         }
     }
 
-    public List<DayImageMappingDto> findAllByMonth(int year, int month) { // @Todo 유저 필터링(id, 세선) 추가
-        return repository.findAllByMonthAndYear(year, month);
+    public List<DayImageMappingDto> findAllByMonth(int year, int month, @AuthenticationPrincipal OAuth2User principal) {
+        return repository.findAllByMonthAndYear(getUserId(principal), year, month);
     }
 
     public List<Post> findAll(@AuthenticationPrincipal OAuth2User principal) {
