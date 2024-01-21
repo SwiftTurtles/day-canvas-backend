@@ -76,8 +76,8 @@ public class PostController {
     }
 
     @DeleteMapping("")
-    public String delete(@RequestBody PostRequestDto postRequestDto) {
-        service.delete(postRequestDto.getId());
+    public String delete(@RequestParam(required = true) Long postId, @AuthenticationPrincipal OAuth2User principal) {
+        service.delete(postId, principal);
         return "redirect:/posts?month=" + LocalDateTime.now().getMonthValue();
     }
 }
